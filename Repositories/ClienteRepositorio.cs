@@ -11,24 +11,32 @@ namespace ClienteApi.Repositories
     public class ClienteRepositorio : IClienteRepositorio
     {
         IConfiguration _configuration;
+
+        public string GetConnection()
+        {
+
+            var connection = _configuration.GetSection("ConnectionStrings").
+            GetSection("TesteDb").Value;
+            return connection;
+        }
         public ClienteRepositorio(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        public bool Add(Cliente cliente)
+        public int Add(Cliente cliente)
         {
-            
+
             var connectionString = this.GetConnection();
             var clientes = new List<Cliente>();
-            int count=0;
+            var affectedRows = 0;
             using (var con = new SqlConnection(connectionString))
             {
                 try
                 {
                     con.Open();
-                    var query = "INSERT INTO clientes (Nome,Cpf,Email,Telefone) VALUES(@Nome,@CPF,@Email,@Telefone)";
-                    count=con.Execute(query,cliente);
+                    var query = "INSERT INTO clientes (Id,Nome,Cpf,Email,Telefone) VALUES(@Id,@Nome,@CPF,@Email,@Telefone)";
+                    affectedRows = con.Execute(query, cliente);
                 }
                 catch (Exception ex)
                 {
@@ -38,38 +46,78 @@ namespace ClienteApi.Repositories
                 {
                     con.Close();
                 }
-                return count==1;
+                return affectedRows;
             }
         }
 
-        public void Delete(string pk)
+        public int Delete(string pk)
         {
-            throw new NotImplementedException();
+            using (var con = new SqlConnection(this.GetConnection()))
+            {
+                var affectedRows = 0;
+                try
+                {
+                    con.Open();
+                    var query = $"DELETE FROM Clientes where id ='{pk}'";
+                    affectedRows = con.Execute(query);
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    con.Close();
+                }
+
+                return affectedRows;
+            }
         }
+
 
         public Cliente Get(string pk)
         {
-            throw new NotImplementedException();
+            using (var con = new SqlConnection(this.GetConnection()))
+            {
+                Cliente c;
+                try
+                {
+                    con.Open();
+                    var query = $"SELECT * FROM clientes where Id = '{pk}'";
+                    c = con.Query<Cliente>(query).FirstOrDefault();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    con.Close();
+
+                }
+
+                return c;
+            }
         }
 
-        public string GetConnection()
-        {
-            var connection = _configuration.GetSection("ConnectionStrings").
-            GetSection("TesteDb").Value;
-            return connection;
-        }
 
-        public List<Cliente> GetPaginado()
+
+        public List<Cliente> GetPaginado(string cpf=null)
         {
             var connectionString = this.GetConnection();
-            var clientes = new List<Cliente>();
+            List<Cliente> clientes;
             using (var con = new SqlConnection(connectionString))
             {
                 try
                 {
                     con.Open();
                     var query = "SELECT * FROM clientes";
+                    if (cpf!=null){
+                        query = $"SELECT * FROM clientes where CPF like {cpf}%";
+                    }
                     clientes = con.Query<Cliente>(query).ToList();
+
                 }
                 catch (Exception ex)
                 {
@@ -83,10 +131,32 @@ namespace ClienteApi.Repositories
             }
         }
 
-        public void Update(Cliente cliente)
+        public int Update(string id, Cliente cliente)
         {
-            throw new NotImplementedException();
+            using (var con = new SqlConnection(this.GetConnection()))
+            {
+                var affectedRows = 0;
+                try
+                {
+                    con.Open();
+                    var query = $"UPDATE Clientes SET Nome=@Nome,CPF=@CPF,Email=@Email,Telefone=@Telefone where Id ='{id}'";
+                    affectedRows = con.Execute(query,cliente);
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    con.Close();
+                }
+
+                return affectedRows;
+            }
         }
+
+       
     }
 
 

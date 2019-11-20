@@ -5,11 +5,11 @@ namespace ClienteApi.Repositories
 {
     public interface IClienteRepositorio
     {
-        bool Add(Cliente cliente);
-        void Update(Cliente cliente);
-        void Delete(string pk);
+        int Add(Cliente cliente);
+        int Update(string id,Cliente cliente);
+        int Delete(string pk);
         Cliente Get(string pk);
-        List<Cliente> GetPaginado();
+        List<Cliente> GetPaginado(string cpf=null);
 
     }
 }

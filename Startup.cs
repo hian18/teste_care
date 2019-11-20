@@ -22,7 +22,6 @@ namespace ClienteApi
         {
 
             services.AddControllers();
-            services.AddRazorPages();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddTransient<IClienteRepositorio, ClienteRepositorio>();
         }
@@ -45,7 +44,6 @@ namespace ClienteApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapRazorPages();
             });
         }
     }
