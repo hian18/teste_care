@@ -12,9 +12,21 @@ namespace ClienteApi.Controllers
     {
 
         [HttpGet]
-        public ActionResult<List<Cliente>> GetList([FromServices]IClienteRepositorio clienteRepositorio)
+        public ActionResult<List<Cliente>> GetList([FromServices]IClienteRepositorio clienteRepositorio, [FromQuery] string cpf=null)
         {
-            return clienteRepositorio.GetPaginado();
+            return clienteRepositorio.GetPaginado(null,cpf);
+        }
+        [HttpPost]
+        [Route("ListarPaginado")]
+        public ActionResult<ClientePaginacao> GetPaginado([FromServices]IClienteRepositorio clienteRepositorio, [FromBody] Paginacao paginacao,[FromQuery] string cpf=null)
+        {
+            ClientePaginacao clientePaginacao=new ClientePaginacao();
+            if (paginacao==null){
+                paginacao.Pagina=1; 
+            }
+            clientePaginacao.items=clienteRepositorio.GetPaginado(paginacao,cpf);
+
+            return clientePaginacao;
         }
         [HttpGet]
         [Route("{id}")]
@@ -41,10 +53,11 @@ namespace ClienteApi.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        
         public ActionResult<Cliente> Put([FromServices]IClienteRepositorio clienteRepositorio, string id, [FromBody] Cliente cliente)
         {
-        //    if(!cliente.CPFisValid())
-        //         ModelState.AddModelError("CPF","CPF invalido");
+           if(!cliente.CPFisValid())
+                ModelState.AddModelError("CPF","CPF invalido");
             if (ModelState.IsValid)
             {
                 int result = clienteRepositorio.Update(id,cliente);

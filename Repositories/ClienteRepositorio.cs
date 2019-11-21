@@ -103,7 +103,7 @@ namespace ClienteApi.Repositories
 
 
 
-        public List<Cliente> GetPaginado(string cpf=null)
+        public List<Cliente> GetPaginado(Paginacao paginacao = null, string cpf = null)
         {
             var connectionString = this.GetConnection();
             List<Cliente> clientes;
@@ -113,10 +113,18 @@ namespace ClienteApi.Repositories
                 {
                     con.Open();
                     var query = "SELECT * FROM clientes";
-                    if (cpf!=null){
-                        query = $"SELECT * FROM clientes where CPF like {cpf}%";
+
+                    if (cpf != null)
+                        query = query + $" where Cpf like '%{cpf}%'";
+
+                    if (paginacao != null){
+
+                        query = query + $" ORDER BY Id DESC Offset {paginacao.QuantidaPorPagina * (paginacao.Pagina -1)}" +
+                         $"ROWS  FETCH NEXT {paginacao.QuantidaPorPagina} ROWS ONLY;";
                     }
+
                     clientes = con.Query<Cliente>(query).ToList();
+                    
 
                 }
                 catch (Exception ex)
@@ -140,7 +148,7 @@ namespace ClienteApi.Repositories
                 {
                     con.Open();
                     var query = $"UPDATE Clientes SET Nome=@Nome,CPF=@CPF,Email=@Email,Telefone=@Telefone where Id ='{id}'";
-                    affectedRows = con.Execute(query,cliente);
+                    affectedRows = con.Execute(query, cliente);
 
                 }
                 catch (Exception ex)
@@ -156,7 +164,6 @@ namespace ClienteApi.Repositories
             }
         }
 
-       
     }
 
 

@@ -7,7 +7,7 @@ namespace ClienteApi.Models
 {
     public class Cliente
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         [Required]
         public string CPF { get; set; }
         [Required]
@@ -17,11 +17,7 @@ namespace ClienteApi.Models
         [Required]
         public string Telefone { get; set; }
 
-        public Cliente()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
-
+        
         public bool CPFisValid()
         {
             var cpf = CPF;

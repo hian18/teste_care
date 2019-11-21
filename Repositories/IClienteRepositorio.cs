@@ -9,7 +9,7 @@ namespace ClienteApi.Repositories
         int Update(string id,Cliente cliente);
         int Delete(string pk);
         Cliente Get(string pk);
-        List<Cliente> GetPaginado(string cpf=null);
+        List<Cliente> GetPaginado(Paginacao paginacao=null, string cpf=null);
 
     }
 }
